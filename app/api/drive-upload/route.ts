@@ -58,8 +58,22 @@ async function getAccessToken(): Promise<string> {
   });
 
   if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`Failed to refresh token: ${error}`);
+    const errorText = await response.text();
+    let errorCode = "";
+
+    try {
+      errorCode = (JSON.parse(errorText) as { error?: string }).error || "";
+    } catch {
+      // Keep the original response available for unexpected token errors.
+    }
+
+    if (errorCode === "invalid_grant") {
+      throw new Error(
+        "Google Drive authorization has expired or been revoked. Generate a new refresh token and update GOOGLE_REFRESH_TOKEN."
+      );
+    }
+
+    throw new Error(`Failed to refresh token: ${errorText}`);
   }
 
   const data = (await response.json()) as { access_token: string };
