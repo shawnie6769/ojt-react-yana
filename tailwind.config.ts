@@ -9,20 +9,21 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["Space Grotesk", "system-ui", "sans-serif"],
-        mono: ["JetBrains Mono", "Fira Code", "monospace"],
+        sans: ["Nunito", "system-ui", "sans-serif"],
+        mono: ["Nunito", "system-ui", "sans-serif"],
+        heading: ["Space Grotesk", "system-ui", "sans-serif"],
       },
       colors: {
-        bg:      "#0F172A",
-        surface: "#1E293B",
-        border:  "#334155",
-        muted:   "#64748B",
-        soft:    "#94A3B8",
-        text:    "#F8FAFC",
-        accent:  "#38BDF8",
-        "accent-dim": "#0EA5E9",
-        danger:  "#F87171",
-        success: "#4ADE80",
+        bg:      "#FDF6F0",
+        surface: "#FFF0F5",
+        border:  "#F4C2C2",
+        muted:   "#C9A0A0",
+        soft:    "#9D6B6B",
+        text:    "#3D1F1F",
+        accent:  "#E8729A",
+        "accent-dim": "#D45C85",
+        danger:  "#E57373",
+        success: "#81C784",
       },
       keyframes: {
         "slide-up": {

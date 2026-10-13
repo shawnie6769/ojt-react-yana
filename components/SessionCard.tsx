@@ -83,7 +83,7 @@ export default function SessionCard({ session, onUpdate, onDelete }: Props) {
         <div className="flex gap-1 shrink-0">
           <button
             onClick={() => setEditing(true)}
-            className="p-1.5 rounded-lg text-muted hover:text-text hover:bg-border transition-colors"
+            className="p-1.5 rounded-full text-muted hover:text-text hover:bg-border transition-colors"
             aria-label="Edit"
           >
             <Pencil size={14} />
@@ -91,7 +91,7 @@ export default function SessionCard({ session, onUpdate, onDelete }: Props) {
           <button
             onClick={handleDelete}
             disabled={deleting}
-            className="p-1.5 rounded-lg text-muted hover:text-danger hover:bg-danger/10 transition-colors"
+            className="p-1.5 rounded-full text-muted hover:text-danger hover:bg-danger/10 transition-colors"
             aria-label="Delete"
           >
             <Trash2 size={14} />

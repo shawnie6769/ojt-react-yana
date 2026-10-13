@@ -80,7 +80,7 @@ export default function HistoryPage() {
 
       {sessions.length === 0 ? (
         <p className="text-muted text-sm text-center py-12 border border-dashed border-border rounded-xl">
-          No sessions logged yet. Hit "+ Log session" above to start.
+          No sessions yet — you&apos;ve got this! 🌸
         </p>
       ) : (
         <div className="space-y-2">

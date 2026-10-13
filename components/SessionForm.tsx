@@ -171,7 +171,7 @@ export default function SessionForm({ initial, onSave, onCancel, onPhotosUpdate 
         <h3 className="font-semibold text-sm text-soft uppercase tracking-widest">
           {initial ? "Edit session" : "Log session"}
         </h3>
-        <button type="button" onClick={onCancel} className="text-muted hover:text-text transition-colors p-1 rounded">
+        <button type="button" onClick={onCancel} className="text-muted hover:text-text transition-colors p-1 rounded-full">
           <X size={16} />
         </button>
       </div>
@@ -325,7 +325,7 @@ export default function SessionForm({ initial, onSave, onCancel, onPhotosUpdate 
               input?.click();
             }}
             disabled={uploading}
-            className="w-full flex items-center justify-center gap-2 py-2 px-3 text-xs font-medium rounded-lg bg-accent/10 border border-accent/40 text-accent hover:bg-accent/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full flex items-center justify-center gap-2 py-2 px-3 text-xs font-medium rounded-full bg-accent/10 border border-accent/40 text-accent hover:bg-accent/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {uploading ? (
               <>

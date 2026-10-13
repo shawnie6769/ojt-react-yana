@@ -100,7 +100,7 @@ export default function CalendarPage() {
           </div>
 
           {selectedSessions.length === 0 ? (
-            <p className="mt-3 text-sm text-muted">No sessions logged on this day.</p>
+            <p className="mt-3 text-sm text-muted">No sessions on this day yet — every little step counts! 🌸</p>
           ) : (
             <div className="mt-3 space-y-2">
               {selectedSessions.map(session => (

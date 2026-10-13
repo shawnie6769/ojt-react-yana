@@ -77,7 +77,7 @@ export default function Dashboard() {
             ${pct >= 100
               ? "text-success border-success/40 bg-success/10"
               : "text-accent border-accent/40 bg-accent/10"}`}>
-            {pct >= 100 ? "✓ Done" : `${pct.toFixed(1)}% complete`}
+            {pct >= 100 ? "✓ All done!" : `${pct.toFixed(1)}% there, keep going! ✨`}
           </span>
         </div>
 
@@ -118,7 +118,7 @@ export default function Dashboard() {
         <h2 className="text-xs font-mono text-muted uppercase tracking-widest mb-3">This week</h2>
         {week.length === 0 ? (
           <p className="text-muted text-sm text-center py-8 border border-dashed border-border rounded-xl">
-            No sessions this week yet.
+            No sessions this week yet — you&apos;re doing great! 🌸
           </p>
         ) : (
           <div className="space-y-2">
