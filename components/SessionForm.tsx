@@ -254,7 +254,7 @@ export default function SessionForm({ initial, onSave, onCancel, onPhotosUpdate 
                     href={photo.webViewLink || "#"}
                     target={photo.webViewLink ? "_blank" : undefined}
                     rel="noopener noreferrer"
-                    className="block aspect-square rounded-lg overflow-hidden bg-border border border-border/50 hover:border-accent/50 transition-colors"
+                    className="block aspect-square rounded-lg overflow-hidden bg-border border border-neutral-900/60 hover:border-accent/50 transition-colors"
                     title="Click to view in Google Drive"
                   >
                     <div className="relative h-full w-full">

@@ -23,7 +23,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <AppBackground />
         <div className="max-w-lg mx-auto px-4 pt-6 pb-28">
           <header className="mb-5 flex items-center justify-between">
-            <Link href="/" className="font-heading text-lg font-semibold text-text">
+            <Link
+              href="/"
+              className="font-heading text-lg font-semibold text-white/90 drop-shadow-[0_2px_10px_rgba(0,0,0,0.55)]"
+            >
               Yana's OJT Journal🌟
             </Link>
             <ThemeToggle />

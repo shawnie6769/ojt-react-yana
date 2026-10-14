@@ -37,7 +37,7 @@ export default function AppBackground() {
   }, []);
 
   return (
-    <div className="fixed inset-0 -z-30 overflow-hidden">
+    <div className="fixed inset-0 -z-30 overflow-hidden bg-black">
       {backgroundUrls.filter(Boolean).length > 0 ? (
         backgroundUrls.map((url, index) =>
           url ? (
@@ -45,7 +45,7 @@ export default function AppBackground() {
               key={`${url}-${index}`}
               src={url}
               alt="Background collage"
-              className="absolute inset-x-0 w-full object-cover blur-[8px]"
+              className="absolute inset-x-0 w-full object-cover blur-[6px]"
               style={{
                 top: `${index * 33.333}vh`,
                 left: 0,
