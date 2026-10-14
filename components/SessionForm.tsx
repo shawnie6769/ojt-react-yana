@@ -27,7 +27,7 @@ function getDefaultValues(): FormValues {
   return {
     work_date: format(now, "yyyy-MM-dd"),
     time_in: "08:00",
-    time_out: "18:00",
+    time_out: "17:00",
     lunch_minutes: 60,
     notes: "",
     photos: [],
