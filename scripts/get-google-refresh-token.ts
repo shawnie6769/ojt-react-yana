@@ -19,7 +19,6 @@
  */
 
 import * as http from "http";
-import * as url from "url";
 import { URLSearchParams } from "url";
 
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID || "";
@@ -97,7 +96,8 @@ async function getRefreshToken(authCode: string): Promise<string> {
  * Start local HTTP server to capture the redirect
  */
 function startCallbackServer(
-  port: number
+  port: number,
+  authUrl: string
 ): Promise<string> {
   return new Promise((resolve, reject) => {
     const server = http.createServer((req, res) => {
@@ -108,21 +108,27 @@ function startCallbackServer(
           return;
         }
 
-        const parsedUrl = url.parse(req.url, true);
-        const authCode = parsedUrl.query.code as string | undefined;
-        const error = parsedUrl.query.error as string | undefined;
+        const parsedUrl = new URL(req.url, `http://localhost:${port}`);
+        if (parsedUrl.pathname !== "/auth/callback") {
+          res.writeHead(404, { "Content-Type": "text/plain" });
+          res.end("Waiting for the Google OAuth callback.");
+          return;
+        }
+
+        const authCode = parsedUrl.searchParams.get("code");
+        const error = parsedUrl.searchParams.get("error");
 
         if (error) {
           res.writeHead(400, { "Content-Type": "text/plain" });
           res.end(`Authorization error: ${error}`);
+          server.close();
           reject(new Error(`Authorization error: ${error}`));
           return;
         }
 
         if (!authCode) {
           res.writeHead(400, { "Content-Type": "text/plain" });
-          res.end("No authorization code received");
-          reject(new Error("No authorization code received"));
+          res.end("No authorization code received. Return to the terminal and try again.");
           return;
         }
 
@@ -142,6 +148,9 @@ function startCallbackServer(
 
     server.listen(port, () => {
       console.log(`\nCallback server listening on http://localhost:${port}`);
+      console.log("\nCopy and open this authorization URL in your browser:");
+      console.log(authUrl);
+      console.log("\nWaiting for Google to redirect to the callback...");
     });
 
     server.on("error", reject);
@@ -161,12 +170,8 @@ async function main(): Promise<void> {
   try {
     // Step 1: Get authorization URL
     const authUrl = getAuthUrl();
-    console.log("Step 1: Opening authorization URL...");
-    console.log(`Auth URL: ${authUrl}\n`);
-
-    // Step 2: Start callback server
-    console.log("Step 2: Starting callback server...");
-    const authCode = await startCallbackServer(3000);
+    console.log("Starting callback server...");
+    const authCode = await startCallbackServer(3000, authUrl);
     console.log(`✓ Authorization code received: ${authCode.substring(0, 20)}...\n`);
 
     // Step 3: Exchange code for refresh token

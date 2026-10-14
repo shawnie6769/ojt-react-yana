@@ -11,7 +11,17 @@ import { Plus } from "lucide-react";
 
 export default function Dashboard() {
   const [sessions, setSessions] = useState<Session[]>([]);
-  const [settings, setSettings] = useState<Settings>({ required_hours: 486, start_date: "2026-07-13" });
+  const [settings, setSettings] = useState<Settings>({
+    required_hours: 486,
+    start_date: "2026-07-13",
+    personal_quote: "Every little step is a chapter in our story.",
+    collage_urls: [
+      "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?auto=format&fit=crop&w=900&q=80",
+    ],
+  });
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -52,6 +62,7 @@ export default function Dashboard() {
   const pct      = progressPct(logged, settings.required_hours);
   const remaining = Math.max(0, settings.required_hours - logged);
   const predictedFinish = predictFinishDate(sessions, settings.required_hours, settings.start_date);
+  const personalQuote = settings.personal_quote || "Every little step is a chapter in our story.";
 
   if (loading) {
     return (
@@ -98,6 +109,17 @@ export default function Dashboard() {
             <span className="text-[11px] text-muted mt-1 block">Based on your recent pace</span>
           </div>
         </div>
+      </div>
+
+      <div className="rounded-2xl border border-border bg-surface/75 p-4 backdrop-blur-sm">
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-[9px] font-mono uppercase tracking-[0.28em] text-muted">Little note</p>
+          <span className="text-[9px] font-medium text-accent/80">for her</span>
+        </div>
+
+        <blockquote className="mt-3 text-sm italic leading-relaxed text-soft/90">
+          “{personalQuote}”
+        </blockquote>
       </div>
 
       {/* log session */}

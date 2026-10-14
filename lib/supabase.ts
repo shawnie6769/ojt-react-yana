@@ -21,6 +21,12 @@ export type Session = {
 export type Settings = {
   required_hours: number;
   start_date: string;
+  personal_quote?: string;
+  collage_urls?: string[];
+  background_url?: string;
+  background_url_1?: string;
+  background_url_2?: string;
+  background_url_3?: string;
 };
 
 function getSupabase() {

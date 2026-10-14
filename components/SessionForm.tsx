@@ -26,7 +26,7 @@ function getDefaultValues(): FormValues {
   const now = new Date();
   return {
     work_date: format(now, "yyyy-MM-dd"),
-    time_in: format(now, "HH:mm"),
+    time_in: "08:00",
     time_out: "18:00",
     lunch_minutes: 60,
     notes: "",

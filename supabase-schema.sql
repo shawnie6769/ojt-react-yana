@@ -15,13 +15,80 @@ create index if not exists idx_sessions_work_date on sessions(work_date desc);
 create table if not exists settings (
   id             int primary key check (id = 1),
   required_hours numeric not null default 486,
-  start_date     date not null default '2026-07-13'
+  start_date     date not null default '2026-07-13',
+  personal_quote text not null default 'Every little step is a chapter in our story.',
+  collage_urls   text[] not null default ARRAY[
+    'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=900&q=80',
+    'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=900&q=80',
+    'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=900&q=80',
+    'https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?auto=format&fit=crop&w=900&q=80'
+  ],
+  background_url text null,
+  background_url_1 text null,
+  background_url_2 text null,
+  background_url_3 text null
 );
 
+alter table settings
+  add column if not exists personal_quote text not null default 'Every little step is a chapter in our story.';
+
+alter table settings
+  add column if not exists collage_urls text[] not null default ARRAY[
+    'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=900&q=80',
+    'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=900&q=80',
+    'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=900&q=80',
+    'https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?auto=format&fit=crop&w=900&q=80'
+  ];
+
+alter table settings
+  add column if not exists background_url text;
+
+alter table settings
+  add column if not exists background_url_1 text;
+
+alter table settings
+  add column if not exists background_url_2 text;
+
+alter table settings
+  add column if not exists background_url_3 text;
+
 -- seed the single settings row
-insert into settings (id, required_hours, start_date)
-values (1, 486, '2026-07-13')
-on conflict (id) do nothing;
+insert into settings (
+  id,
+  required_hours,
+  start_date,
+  personal_quote,
+  collage_urls,
+  background_url,
+  background_url_1,
+  background_url_2,
+  background_url_3
+)
+values (
+  1,
+  486,
+  '2026-07-13',
+  'Every little step is a chapter in our story.',
+  ARRAY[
+    'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=900&q=80',
+    'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=900&q=80',
+    'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=900&q=80',
+    'https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?auto=format&fit=crop&w=900&q=80'
+  ],
+  null,
+  null,
+  null,
+  null
+)
+on conflict (id) do update set
+  required_hours = excluded.required_hours,
+  start_date = excluded.start_date,
+  personal_quote = excluded.personal_quote,
+  collage_urls = excluded.collage_urls,
+  background_url = excluded.background_url,
+  background_url_1 = excluded.background_url_1,
+  background_url_2 = excluded.background_url_2,
+  background_url_3 = excluded.background_url_3;
 
 -- Enable Row Level Security (recommended; allows full access since we use anon key for personal use)
 alter table sessions enable row level security;
