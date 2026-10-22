@@ -191,8 +191,7 @@ export default function SettingsPage() {
               <input
                 id={`background-upload-${slot}`}
                 type="file"
-                accept="image/*"
-                capture="environment"
+                accept="image/jpeg,image/png,image/webp,image/heic,image/heif"
                 onChange={(e) => handleBackgroundUpload(slot as 1 | 2 | 3, e)}
                 className="hidden"
               />

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { format } from "date-fns";
 import { Session, Photo } from "@/lib/supabase";
 import { sessionHours, driveThumbnailUrl } from "@/lib/hours";
@@ -34,6 +34,17 @@ function getDefaultValues(): FormValues {
   };
 }
 
+const timeOptions = Array.from({ length: 33 }, (_, index) => {
+  const totalMinutes = (6 * 60) + index * 30;
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  const value = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
+  const period = hours >= 12 ? "PM" : "AM";
+  const displayHour = hours % 12 || 12;
+
+  return { value, label: `${displayHour}:${minutes.toString().padStart(2, "0")} ${period}` };
+});
+
 export default function SessionForm({ initial, onSave, onCancel, onPhotosUpdate }: Props) {
   const [values, setValues] = useState<FormValues>(() =>
     initial
@@ -51,9 +62,30 @@ export default function SessionForm({ initial, onSave, onCancel, onPhotosUpdate 
   const [error, setError] = useState("");
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
+  const [photoUploadAvailable, setPhotoUploadAvailable] = useState(true);
   const [photos, setPhotos] = useState<Photo[]>(initial?.photos ?? []);
 
   const preview = sessionHours({ ...values } as Session);
+
+  useEffect(() => {
+    let active = true;
+
+    fetch("/api/drive-status")
+      .then(response => {
+        if (!response.ok) throw new Error("Drive status check failed");
+        return response.json() as Promise<{ available?: boolean }>;
+      })
+      .then(result => {
+        if (active) setPhotoUploadAvailable(result.available === true);
+      })
+      .catch(() => {
+        if (active) setPhotoUploadAvailable(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   function set<K extends keyof FormValues>(k: K, v: FormValues[K]) {
     setValues(prev => ({ ...prev, [k]: v }));
@@ -94,7 +126,12 @@ export default function SessionForm({ initial, onSave, onCancel, onPhotosUpdate 
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Upload failed");
+        const message = error.error || "Upload failed";
+        if (/invalid_client|invalid_grant|oauth credentials|refresh token/i.test(message)) {
+          setPhotoUploadAvailable(false);
+          return;
+        }
+        throw new Error(message);
       }
 
       const result = await response.json();
@@ -180,9 +217,12 @@ export default function SessionForm({ initial, onSave, onCancel, onPhotosUpdate 
         <div className="col-span-2 flex flex-col gap-1">
           <label className="text-xs text-muted font-mono uppercase tracking-wider">Date</label>
           <input
-            type="date"
+            type="text"
             value={values.work_date}
             onChange={e => set("work_date", e.target.value)}
+            pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}"
+            inputMode="numeric"
+            placeholder="YYYY-MM-DD"
             required
             className="input"
           />
@@ -190,23 +230,29 @@ export default function SessionForm({ initial, onSave, onCancel, onPhotosUpdate 
 
         <div className="flex flex-col gap-1">
           <label className="text-xs text-muted font-mono uppercase tracking-wider">Time in</label>
-          <input
-            type="time"
+          <select
             value={values.time_in}
             onChange={e => set("time_in", e.target.value)}
             required
             className="input font-mono"
-          />
+          >
+            {timeOptions.map(option => (
+              <option key={option.value} value={option.value}>{option.label}</option>
+            ))}
+          </select>
         </div>
         <div className="flex flex-col gap-1">
           <label className="text-xs text-muted font-mono uppercase tracking-wider">Time out</label>
-          <input
-            type="time"
+          <select
             value={values.time_out}
             onChange={e => set("time_out", e.target.value)}
             required
             className="input font-mono"
-          />
+          >
+            {timeOptions.map(option => (
+              <option key={option.value} value={option.value}>{option.label}</option>
+            ))}
+          </select>
         </div>
 
         <div className="flex flex-col gap-1">
@@ -285,16 +331,18 @@ export default function SessionForm({ initial, onSave, onCancel, onPhotosUpdate 
                     </div>
                   </a>
 
-                  <button
-                    type="button"
-                    onClick={() => handleDeletePhoto(photo.driveFileId)}
-                    disabled={uploading}
-                    className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-danger text-xs font-bold text-white border border-surface shadow-md opacity-90 hover:opacity-100 transition-opacity disabled:cursor-not-allowed disabled:opacity-60"
-                    aria-label="Delete photo"
-                    title="Delete photo"
-                  >
-                    ×
-                  </button>
+                  {photoUploadAvailable && (
+                    <button
+                      type="button"
+                      onClick={() => handleDeletePhoto(photo.driveFileId)}
+                      disabled={uploading}
+                      className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-danger text-xs font-bold text-white border border-surface shadow-md opacity-90 hover:opacity-100 transition-opacity disabled:cursor-not-allowed disabled:opacity-60"
+                      aria-label="Delete photo"
+                      title="Delete photo"
+                    >
+                      ×
+                    </button>
+                  )}
                 </div>
               ))}
             </div>
@@ -308,38 +356,42 @@ export default function SessionForm({ initial, onSave, onCancel, onPhotosUpdate 
           </div>
         )}
 
-        <label className="block">
-          <input
-            type="file"
-            multiple
-            accept="image/*"
-            onChange={handlePhotoUpload}
-            disabled={uploading}
-            className="hidden"
-            aria-label="Upload photos"
-          />
-          <button
-            type="button"
-            onClick={(e) => {
-              const input = e.currentTarget.previousElementSibling as HTMLInputElement;
-              input?.click();
-            }}
-            disabled={uploading}
-                    className="w-full flex items-center justify-center gap-2 py-2 px-3 text-xs font-medium rounded-full bg-accent/10 border border-accent/40 text-accent hover:bg-accent/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {uploading ? (
-              <>
-                <Loader size={14} className="animate-spin" />
-                Uploading…
-              </>
-            ) : (
-              <>
-                <Camera size={14} />
-                Add photos
-              </>
-            )}
-          </button>
-        </label>
+        {photoUploadAvailable ? (
+          <label className="block">
+            <input
+              type="file"
+              multiple
+              accept="image/*"
+              onChange={handlePhotoUpload}
+              disabled={uploading}
+              className="hidden"
+              aria-label="Upload photos"
+            />
+            <button
+              type="button"
+              onClick={(e) => {
+                const input = e.currentTarget.previousElementSibling as HTMLInputElement;
+                input?.click();
+              }}
+              disabled={uploading}
+              className="w-full flex items-center justify-center gap-2 py-2 px-3 text-xs font-medium rounded-full bg-accent/10 border border-accent/40 text-accent hover:bg-accent/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {uploading ? (
+                <>
+                  <Loader size={14} className="animate-spin" />
+                  Uploading…
+                </>
+              ) : (
+                <>
+                  <Camera size={14} />
+                  Add photos
+                </>
+              )}
+            </button>
+          </label>
+        ) : (
+          <p className="text-xs text-muted">Photo upload unavailable</p>
+        )}
       </div>
 
       {error && <p className="text-danger text-sm">{error}</p>}

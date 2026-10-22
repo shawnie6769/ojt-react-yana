@@ -1,34 +1,6 @@
 import { NextResponse } from "next/server";
 import { google } from "googleapis";
-
-async function getAccessToken(): Promise<string> {
-  const refreshToken = process.env.GOOGLE_REFRESH_TOKEN;
-  const clientId = process.env.GOOGLE_CLIENT_ID;
-  const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-
-  if (!refreshToken || !clientId || !clientSecret) {
-    throw new Error("Missing Google OAuth credentials in environment variables");
-  }
-
-  const response = await fetch("https://oauth2.googleapis.com/token", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({
-      client_id: clientId,
-      client_secret: clientSecret,
-      refresh_token: refreshToken,
-      grant_type: "refresh_token",
-    }).toString(),
-  });
-
-  if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`Failed to refresh token: ${error}`);
-  }
-
-  const data = (await response.json()) as { access_token: string };
-  return data.access_token;
-}
+import { getGoogleDriveAccessToken } from "@/lib/google-drive-auth";
 
 export async function POST(request: Request) {
   try {
@@ -39,7 +11,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Missing driveFileId" }, { status: 400 });
     }
 
-    const accessToken = await getAccessToken();
+    const accessToken = await getGoogleDriveAccessToken();
     const auth = new google.auth.OAuth2();
     auth.setCredentials({ access_token: accessToken });
 
